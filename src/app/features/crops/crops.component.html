@@ -1,284 +1,246 @@
-<div class="w-full">
-  <!-- Page Header -->
-  <div class="flex justify-between items-start mb-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-1">Cultivos</h2>
-      <p class="text-sm text-gray-500">Explora y gestiona los tipos de cultivos disponibles</p>
-    </div>
-    <button 
-      (click)="openAddModal()"
-      class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md hover:-translate-y-px">
-      <i class="fa-solid fa-plus"></i>
-      Agregar Cultivo
-    </button>
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900 mb-1">Catálogo de Cultivos</h1>
+    <p class="text-sm text-gray-500">Explora y gestiona los tipos de cultivos disponibles</p>
   </div>
-
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white p-4 rounded-lg border border-gray-200">
-      <div class="text-sm text-gray-500 mb-1">Total Cultivos</div>
-      <div class="text-2xl font-bold text-gray-900">{{ totalCrops }}</div>
-    </div>
-    <div class="bg-white p-4 rounded-lg border border-gray-200">
-      <div class="text-sm text-gray-500 mb-1">En Producción</div>
-      <div class="text-2xl font-bold text-green-600">{{ cropsInProduction }}</div>
-    </div>
-    <div class="bg-white p-4 rounded-lg border border-gray-200">
-      <div class="text-sm text-gray-500 mb-1">Cereales</div>
-      <div class="text-2xl font-bold text-yellow-600">{{ cerealCrops }}</div>
-    </div>
-    <div class="bg-white p-4 rounded-lg border border-gray-200">
-      <div class="text-sm text-gray-500 mb-1">Hortalizas</div>
-      <div class="text-2xl font-bold text-red-600">{{ vegetableCrops }}</div>
-    </div>
-  </div>
-
-  <!-- Filters and Search -->
-  <div class="flex flex-wrap gap-4 mb-6">
+  
+  <div class="flex items-center gap-4">
     <!-- Search Bar -->
-    <div class="relative flex-1 min-w-[300px]">
+    <div class="relative">
       <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
       <input 
         type="text" 
         [(ngModel)]="searchTerm"
-        placeholder="Buscar por nombre, categoría, suelo o estado..." 
-        class="w-full py-2.5 px-3 pl-10 border border-gray-200 rounded-md bg-white text-gray-800 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors">
+        placeholder="Buscar..." 
+        class="w-64 py-2.5 px-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-800 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors">
     </div>
-
-    <!-- Category Filter -->
-    <select 
-      [(ngModel)]="selectedCategory"
-      class="px-4 py-2 bg-white border border-gray-200 rounded-md text-gray-700 text-sm hover:bg-gray-50 transition-colors outline-none focus:border-green-500">
-      <option value="all">Todas las categorías</option>
-      <option value="Cereal">Cereales</option>
-      <option value="Hortaliza">Hortalizas</option>
-      <option value="Tubérculo">Tubérculos</option>
-      <option value="Legumbre">Legumbres</option>
-    </select>
-
-    <!-- Status Filter -->
-    <select 
-      [(ngModel)]="selectedStatus"
-      class="px-4 py-2 bg-white border border-gray-200 rounded-md text-gray-700 text-sm hover:bg-gray-50 transition-colors outline-none focus:border-green-500">
-      <option value="all">Todos los estados</option>
-      <option value="Disponible">Disponible</option>
-      <option value="En Producción">En Producción</option>
-      <option value="Temporada Cerrada">Temporada Cerrada</option>
-    </select>
-
-    <!-- Show Inactive Toggle -->
+    
+    <!-- Add Button -->
     <button 
-      (click)="toggleShowInactive()"
-      class="px-4 py-2 border rounded-md text-sm font-medium transition-colors"
-      [ngClass]="showInactive ? 'bg-red-50 border-red-200 text-red-700' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'">
-      <i class="fa-solid fa-eye-slash mr-2" *ngIf="!showInactive"></i>
-      <i class="fa-solid fa-eye mr-2" *ngIf="showInactive"></i>
-      {{ showInactive ? 'Ver Activos' : 'Ver Inactivos' }}
-    </button>
-
-    <!-- Clear Filters -->
-    <button 
-      (click)="clearFilters()"
-      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors">
-      <i class="fa-solid fa-filter-circle-xmark mr-2"></i>
-      Limpiar
-    </button>
-  </div>
-
-  <!-- Crops Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div *ngFor="let crop of filteredCrops" 
-         class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-         [ngClass]="!crop.isActive ? 'opacity-60 border-red-200' : ''">
-      
-      <!-- Crop Image -->
-      <div class="relative h-48 bg-gray-100">
-        <img [src]="crop.image" [alt]="crop.name" class="w-full h-full object-cover">
-        
-        <!-- Inactive Overlay -->
-        <div *ngIf="!crop.isActive" class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center">
-          <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">INACTIVO</span>
-        </div>
-        
-        <!-- Crop Name Badge -->
-        <div class="absolute top-3 left-3">
-          <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white" [ngClass]="crop.statusColor">
-            <i class="fa-solid fa-seedling"></i>
-            {{ crop.name }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Crop Info -->
-      <div class="p-4">
-        <!-- Growth Time -->
-        <div class="flex items-center gap-2 mb-3">
-          <i class="fa-regular fa-clock text-green-500"></i>
-          <div>
-            <div class="text-xs text-gray-500">Tiempo de crecimiento</div>
-            <div class="text-sm font-medium text-gray-900">{{ crop.growthTime }}</div>
-          </div>
-        </div>
-
-        <!-- Risk Level -->
-        <div class="flex items-center gap-2 mb-3">
-          <i class="fa-solid fa-droplet" [ngClass]="getRiskLevelColor(crop.riskLevel)"></i>
-          <div>
-            <div class="text-xs text-gray-500">Nivel de riego</div>
-            <div class="text-sm font-medium" [ngClass]="getRiskLevelColor(crop.riskLevel)">{{ crop.riskLevel }}</div>
-          </div>
-        </div>
-
-        <!-- Soil Type -->
-        <div class="mb-4">
-          <div class="text-xs text-gray-500 mb-1">Suelo ideal</div>
-          <div class="text-sm text-gray-900">{{ crop.soilType }}</div>
-        </div>
-
-        <!-- Status Badge -->
-        <div class="mb-4">
-          <span class="inline-block px-2 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusBadgeColor(crop.status)">
-            {{ crop.status }}
-          </span>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-2">
-          <button 
-            (click)="viewCropDetails(crop)"
-            class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-md text-sm hover:bg-blue-100 transition-colors"
-            title="Ver detalles">
-            <i class="fa-regular fa-eye"></i>
-            Ver
-          </button>
-          <button 
-            (click)="openEditModal(crop)"
-            class="flex items-center justify-center w-10 h-10 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
-            title="Editar">
-            <i class="fa-regular fa-pen-to-square"></i>
-          </button>
-          <button 
-            (click)="toggleCropStatus(crop)"
-            class="flex items-center justify-center w-10 h-10 rounded-md transition-colors"
-            [ngClass]="crop.isActive ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-green-50 text-green-700 hover:bg-green-100'"
-            [title]="crop.isActive ? 'Desactivar' : 'Restaurar'">
-            <i class="fa-regular" [ngClass]="crop.isActive ? 'fa-trash-can' : 'fa-rotate-left'"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="filteredCrops.length === 0" class="text-center py-12">
-    <div class="text-gray-400 mb-4">
-      <i class="fa-solid fa-seedling text-4xl"></i>
-    </div>
-    <h3 class="text-lg font-medium text-gray-900 mb-2">No se encontraron cultivos</h3>
-    <p class="text-gray-500 mb-4">
-      {{ showInactive ? 'No hay cultivos inactivos' : 'Intenta ajustar tu búsqueda o agrega un nuevo cultivo.' }}
-    </p>
-    <button 
-      *ngIf="!showInactive"
       (click)="openAddModal()"
-      class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+      class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
       <i class="fa-solid fa-plus"></i>
       Agregar Cultivo
     </button>
   </div>
 </div>
 
-<!-- Modal de Detalles -->
-<div *ngIf="showDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center p-6 border-b border-gray-200">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-lg flex items-center justify-center text-white" [ngClass]="selectedCrop?.statusColor">
-          <i class="fa-solid fa-seedling text-lg"></i>
-        </div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="text-sm text-gray-500 mb-2">Total Cultivos</div>
+    <div class="text-3xl font-bold text-gray-900">{{ totalCrops }}</div>
+  </div>
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="text-sm text-gray-500 mb-2">En Producción</div>
+    <div class="text-3xl font-bold text-green-600">{{ cropsInProduction }}</div>
+  </div>
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="text-sm text-gray-500 mb-2">Cereales</div>
+    <div class="text-3xl font-bold text-yellow-600">{{ cerealCrops }}</div>
+  </div>
+  <div class="bg-white p-6 rounded-lg border border-gray-200">
+    <div class="text-sm text-gray-500 mb-2">Hortalizas</div>
+    <div class="text-3xl font-bold text-red-600">{{ vegetableCrops }}</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="flex justify-end items-center mb-8">
+  <!-- Show Inactive Toggle -->
+  <button 
+    (click)="toggleShowInactive()"
+    class="flex items-center gap-2 px-3 py-2 border rounded-lg text-xs font-medium transition-colors"
+    [ngClass]="showInactive ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'">
+    <i class="fa-solid fa-eye-slash text-xs" *ngIf="!showInactive"></i>
+    <i class="fa-solid fa-eye text-xs" *ngIf="showInactive"></i>
+    {{ showInactive ? 'Ver Activos' : 'Ver Inactivos' }}
+  </button>
+</div>
+
+<!-- Crops Grid -->
+<div class="grid grid-cols-4 gap-6">
+  <div *ngFor="let crop of filteredCrops" 
+       class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+       [ngClass]="!crop.isActive ? 'opacity-60 border-red-200' : ''">
+    
+    <!-- Crop Image -->
+    <div class="relative h-48 bg-gray-100">
+      <img [src]="crop.image" [alt]="crop.name" class="w-full h-full object-cover" 
+           [style.filter]="!crop.isActive ? 'brightness(0.6)' : 'brightness(1)'">
+      
+      <!-- Inactive Overlay - Solo para el badge -->
+      <div *ngIf="!crop.isActive" class="absolute inset-0 flex items-center justify-center">
+        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium">INACTIVO</span>
+      </div>
+      
+      <!-- Crop Name Badge -->
+      <div class="absolute top-3 left-3">
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white" [ngClass]="crop.statusColor">
+          <i class="fa-solid fa-seedling"></i>
+          {{ crop.name }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Crop Info -->
+    <div class="p-4">
+      <!-- Growth Time -->
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fa-regular fa-calendar text-green-500 text-sm"></i>
         <div>
-          <h3 class="text-xl font-bold text-gray-900">{{ selectedCrop?.name }}</h3>
-          <p class="text-sm text-gray-500">{{ selectedCrop?.category }}</p>
-        </div>
-      </div>
-      <button (click)="closeModals()" class="text-gray-400 hover:text-gray-600 transition-colors">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-    </div>
-
-    <!-- Content -->
-    <div class="p-6">
-      <!-- Image -->
-      <div class="mb-6">
-        <img [src]="selectedCrop?.image" [alt]="selectedCrop?.name" class="w-full h-48 object-cover rounded-lg">
-      </div>
-
-      <!-- Info Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium text-gray-500">Tiempo de Crecimiento</label>
-            <p class="text-gray-900">{{ selectedCrop?.growthTime }}</p>
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-500">Nivel de Riego</label>
-            <p class="text-gray-900">{{ selectedCrop?.riskLevel }}</p>
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-500">Tipo de Suelo</label>
-            <p class="text-gray-900">{{ selectedCrop?.soilType }}</p>
-          </div>
-        </div>
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium text-gray-500">Estado</label>
-            <p>
-              <span class="inline-block px-2 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusBadgeColor(selectedCrop?.status || '')">
-                {{ selectedCrop?.status }}
-              </span>
-            </p>
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-500">Categoría</label>
-            <p class="text-gray-900">{{ selectedCrop?.category }}</p>
-          </div>
-          <div>
-            <label class="text-sm font-medium text-gray-500">Estado del Cultivo</label>
-            <p class="text-gray-900">
-              <span [ngClass]="selectedCrop?.isActive ? 'text-green-600' : 'text-red-600'">
-                {{ selectedCrop?.isActive ? 'Activo' : 'Inactivo' }}
-              </span>
-            </p>
-          </div>
+          <div class="text-xs text-gray-500">Tiempo de crecimiento</div>
+          <div class="text-sm font-medium text-gray-900">{{ crop.growthTime }}</div>
         </div>
       </div>
 
-      <!-- Description -->
-      <div class="mb-6" *ngIf="selectedCrop?.description">
-        <label class="text-sm font-medium text-gray-500 block mb-2">Descripción</label>
-        <p class="text-gray-900">{{ selectedCrop?.description }}</p>
+      <!-- Risk Level -->
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-droplet text-blue-500 text-sm"></i>
+        <div>
+          <div class="text-xs text-gray-500">Nivel de riego</div>
+          <div class="text-sm font-medium text-blue-600">{{ crop.riskLevel }}</div>
+        </div>
       </div>
 
-      <!-- Tips -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" *ngIf="selectedCrop?.plantingTips || selectedCrop?.harvestTips">
-        <div *ngIf="selectedCrop?.plantingTips">
-          <label class="text-sm font-medium text-gray-500 block mb-2">Consejos de Siembra</label>
-          <p class="text-gray-900 text-sm">{{ selectedCrop?.plantingTips }}</p>
-        </div>
-        <div *ngIf="selectedCrop?.harvestTips">
-          <label class="text-sm font-medium text-gray-500 block mb-2">Consejos de Cosecha</label>
-          <p class="text-gray-900 text-sm">{{ selectedCrop?.harvestTips }}</p>
-        </div>
+      <!-- Soil Type -->
+      <div class="mb-4">
+        <div class="text-xs text-gray-500 mb-1">Suelo ideal</div>
+        <div class="text-sm text-gray-900">{{ crop.soilType }}</div>
+      </div>
+
+      <!-- Status Badge -->
+      <div class="mb-4">
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusBadgeColor(crop.status)">
+          {{ crop.status }}
+        </span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-2">
+        <button 
+          (click)="viewCropDetails(crop)"
+          class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 text-gray-700 rounded-md text-sm hover:bg-gray-100 transition-colors border border-gray-200"
+          title="Ver detalles">
+          <i class="fa-regular fa-eye"></i>
+          Ver detalles
+        </button>
+        <button 
+          (click)="openEditModal(crop)"
+          class="flex items-center justify-center w-10 h-10 rounded-md transition-colors border bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200"
+          title="Editar">
+          <i class="fa-regular fa-pen-to-square"></i>
+        </button>
+        <button 
+          (click)="toggleCropStatus(crop)"
+          class="flex items-center justify-center w-10 h-10 rounded-md transition-colors border"
+          [ngClass]="crop.isActive ? 'bg-red-50 text-red-700 hover:bg-red-100 border-red-200' : 'bg-green-50 text-green-700 hover:bg-green-100 border-green-200'"
+          [title]="crop.isActive ? 'Desactivar' : 'Restaurar'">
+          <i class="fa-solid" [ngClass]="crop.isActive ? 'fa-trash-can' : 'fa-arrow-rotate-left'"></i>
+        </button>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Footer -->
-    <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
-      <button (click)="closeModals()" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+<!-- Empty State -->
+<div *ngIf="filteredCrops.length === 0" class="text-center py-12">
+  <div class="text-gray-400 mb-4">
+    <i class="fa-solid fa-seedling text-4xl"></i>
+  </div>
+  <h3 class="text-lg font-medium text-gray-900 mb-2">No se encontraron cultivos</h3>
+  <p class="text-gray-500 mb-4">
+    {{ showInactive ? 'No hay cultivos inactivos' : 'Intenta ajustar tu búsqueda o agrega un nuevo cultivo.' }}
+  </p>
+  <button 
+    *ngIf="!showInactive"
+    (click)="openAddModal()"
+    class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+    <i class="fa-solid fa-plus"></i>
+    Agregar Cultivo
+  </button>
+</div>
+
+<!-- Modal de Detalles -->
+<div *ngIf="showDetailsModal" class="fixed inset-0 flex items-center justify-center z-[1000]" style="background-color: rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px);" (click)="closeModals()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4" (click)="$event.stopPropagation()">
+    <!-- Header del Modal -->
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Detalles del Cultivo</h3>
+          <p class="text-sm text-gray-500 mt-1">Información completa del cultivo seleccionado</p>
+        </div>
+        <button (click)="closeModals()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <i class="fa-solid fa-times text-lg"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Contenido del Modal -->
+    <div class="px-6 py-5" *ngIf="selectedCrop">
+      <div class="space-y-6">
+        <!-- Imagen y Info Principal -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <img [src]="selectedCrop.image" [alt]="selectedCrop.name" class="w-full h-48 object-cover rounded-lg border border-gray-200">
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-gray-500">Nombre del Cultivo</label>
+              <p class="text-lg font-semibold text-gray-900 mt-1">{{ selectedCrop.name }}</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-500">Categoría</label>
+              <p class="text-gray-900 mt-1">{{ selectedCrop.category }}</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-500">Temporada</label>
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-medium mt-1" [ngClass]="getStatusBadgeColor(selectedCrop.status)">
+                {{ selectedCrop.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Características del Cultivo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-gray-500">Tiempo de Crecimiento</label>
+              <div class="flex items-center gap-2 mt-1">
+                <i class="fa-regular fa-calendar text-green-500"></i>
+                <p class="text-gray-900">{{ selectedCrop.growthTime }}</p>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-500">Nivel de Riego</label>
+              <div class="flex items-center gap-2 mt-1">
+                <i class="fa-solid fa-droplet text-blue-500"></i>
+                <p class="text-blue-600 font-medium">{{ selectedCrop.riskLevel }}</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-500">Tipo de Suelo Ideal</label>
+            <p class="text-gray-900 mt-1">{{ selectedCrop.soilType }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer del Modal -->
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+      <button 
+        (click)="closeModals()" 
+        class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm">
         Cerrar
       </button>
-      <button (click)="openEditModal(selectedCrop!)" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors">
+      <button 
+        (click)="openEditModal(selectedCrop!)" 
+        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
+        <i class="fa-regular fa-pen-to-square mr-1"></i>
         Editar Cultivo
       </button>
     </div>
@@ -286,153 +248,208 @@
 </div>
 
 <!-- Modal de Editar/Agregar -->
-<div *ngIf="showEditModal || showAddModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center p-6 border-b border-gray-200">
-      <h3 class="text-xl font-bold text-gray-900">
-        {{ showAddModal ? 'Agregar Nuevo Cultivo' : 'Editar Cultivo' }}
-      </h3>
-      <button (click)="closeModals()" class="text-gray-400 hover:text-gray-600 transition-colors">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-    </div>
-
-    <!-- Form -->
-    <form [formGroup]="cropForm" (ngSubmit)="saveCrop()" class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Nombre -->
+<div *ngIf="showEditModal || showAddModal" class="fixed inset-0 flex items-center justify-center z-[1000]" style="background-color: rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px);" (click)="closeModals()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4" (click)="$event.stopPropagation()">
+    <!-- Header del Modal -->
+    <div class="px-5 py-4 border-b border-gray-100">
+      <div class="flex justify-between items-start">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Cultivo *</label>
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ showAddModal ? 'Agregar Nuevo Cultivo' : 'Editar Cultivo' }}
+          </h3>
+          <p class="text-sm text-gray-500 mt-1">Completa la información del cultivo</p>
+        </div>
+        <button (click)="closeModals()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <i class="fa-solid fa-times text-lg"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Contenido del Modal -->
+    <div class="px-5 py-4 space-y-3">
+      <form [formGroup]="cropForm" (ngSubmit)="saveCrop()" class="space-y-3">
+        <!-- Nombre del Cultivo -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Cultivo</label>
           <input 
             type="text" 
             formControlName="name"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
             placeholder="Ej: Trigo">
-          <div *ngIf="cropForm.get('name')?.invalid && cropForm.get('name')?.touched" class="text-red-500 text-xs mt-1">
-            El nombre es requerido (mínimo 2 caracteres)
+        </div>
+
+        <!-- URL de la Imagen -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
+          <input 
+            type="url" 
+            formControlName="image"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+            placeholder="https://images.unsplash.com/...">
+          
+          <!-- Vista previa de la imagen -->
+          <div class="mt-2" *ngIf="cropForm.get('image')?.value">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Vista previa:</label>
+            <div class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+              <img 
+                [src]="cropForm.get('image')?.value" 
+                [alt]="cropForm.get('name')?.value || 'Vista previa'"
+                class="w-full h-full object-cover"
+                (error)="$event.target.src='https://via.placeholder.com/400x200?text=Imagen+no+encontrada'"
+                loading="lazy">
+            </div>
           </div>
         </div>
 
-        <!-- Categoría -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
-          <select 
-            formControlName="category"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
-            <option value="">Seleccionar categoría</option>
-            <option value="Cereal">Cereal</option>
-            <option value="Hortaliza">Hortaliza</option>
-            <option value="Tubérculo">Tubérculo</option>
-            <option value="Legumbre">Legumbre</option>
-          </select>
+        <!-- Categoría y Nivel de Riego -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+            <select 
+              formControlName="category"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
+              <option value="">Seleccionar</option>
+              <option value="Cereal">Cereal</option>
+              <option value="Hortaliza">Hortaliza</option>
+              <option value="Tubérculo">Tubérculo</option>
+              <option value="Legumbre">Legumbre</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de Riego</label>
+            <select 
+              formControlName="riskLevel"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
+              <option value="Medio">Medio</option>
+              <option value="Alto">Alto</option>
+              <option value="Muy Alto">Muy Alto</option>
+            </select>
+          </div>
         </div>
 
-        <!-- Tiempo de Crecimiento -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Tiempo de Crecimiento *</label>
-          <input 
-            type="text" 
-            formControlName="growthTime"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            placeholder="Ej: 90-120 días">
-        </div>
-
-        <!-- Nivel de Riego -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Nivel de Riego *</label>
-          <select 
-            formControlName="riskLevel"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
-            <option value="Medio">Medio</option>
-            <option value="Alto">Alto</option>
-            <option value="Muy Alto">Muy Alto</option>
-          </select>
+        <!-- Tiempo de Crecimiento y Temporada -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo de Crecimiento</label>
+            <input 
+              type="text" 
+              formControlName="growthTime"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              placeholder="Ej: 120-140 días">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Temporada</label>
+            <select 
+              formControlName="status"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
+              <option value="Primavera-Verano">Primavera-Verano</option>
+              <option value="Primavera-Otoño">Primavera-Otoño</option>
+              <option value="Otoño-Invierno">Otoño-Invierno</option>
+              <option value="Todo el año">Todo el año</option>
+              <option value="Verano">Verano</option>
+            </select>
+          </div>
         </div>
 
         <!-- Tipo de Suelo -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Suelo Ideal *</label>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Suelo</label>
           <input 
             type="text" 
             formControlName="soilType"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
             placeholder="Ej: Franco a franco-arcilloso">
-        </div>
-
-        <!-- Estado -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Estado *</label>
-          <select 
-            formControlName="status"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
-            <option value="Disponible">Disponible</option>
-            <option value="En Producción">En Producción</option>
-            <option value="Temporada Cerrada">Temporada Cerrada</option>
-          </select>
         </div>
 
         <!-- Color del Badge -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Color del Badge *</label>
-          <select 
-            formControlName="statusColor"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
-            <option value="bg-green-500">Verde</option>
-            <option value="bg-blue-500">Azul</option>
-            <option value="bg-orange-500">Naranja</option>
-            <option value="bg-red-500">Rojo</option>
-            <option value="bg-purple-500">Morado</option>
-            <option value="bg-yellow-500">Amarillo</option>
-          </select>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Color del Badge</label>
+          <div class="flex gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" formControlName="statusColor" value="bg-orange-500" class="sr-only">
+              <div class="w-6 h-6 bg-orange-500 rounded-full border-2 border-transparent hover:border-gray-300 transition-colors"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" formControlName="statusColor" value="bg-blue-500" class="sr-only">
+              <div class="w-6 h-6 bg-blue-500 rounded-full border-2 border-transparent hover:border-gray-300 transition-colors"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" formControlName="statusColor" value="bg-green-500" class="sr-only">
+              <div class="w-6 h-6 bg-green-500 rounded-full border-2 border-transparent hover:border-gray-300 transition-colors"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" formControlName="statusColor" value="bg-red-500" class="sr-only">
+              <div class="w-6 h-6 bg-red-500 rounded-full border-2 border-transparent hover:border-gray-300 transition-colors"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" formControlName="statusColor" value="bg-yellow-500" class="sr-only">
+              <div class="w-6 h-6 bg-yellow-500 rounded-full border-2 border-transparent hover:border-gray-300 transition-colors"></div>
+            </label>
+          </div>
         </div>
+      </form>
+    </div>
+    
+    <!-- Footer del Modal -->
+    <div class="px-5 py-3 border-t border-gray-100 flex justify-end gap-3">
+      <button 
+        type="button" 
+        (click)="closeModals()" 
+        class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm">
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        (click)="saveCrop()"
+        [disabled]="!cropForm.valid"
+        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 text-sm font-medium">
+        <i class="fa-solid fa-save mr-1"></i>
+        {{ showAddModal ? 'Agregar Cultivo' : 'Editar Cultivo' }}
+      </button>
+    </div>
+  </div>
+</div>
 
-        <!-- Descripción -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-          <textarea 
-            formControlName="description"
-            rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            placeholder="Descripción del cultivo..."></textarea>
+<!-- Modal de Confirmación -->
+<div *ngIf="showConfirmModal" class="fixed inset-0 flex items-center justify-center z-[1001]" style="background-color: rgba(0, 0, 0, 0.2); backdrop-filter: blur(4px);" (click)="closeModals()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4" (click)="$event.stopPropagation()">
+    <!-- Header del Modal -->
+    <div class="px-6 py-5 border-b border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center" 
+             [ngClass]="(confirmAction === 'save-edit' || confirmAction === 'save-add') ? 'bg-blue-100' : (confirmAction === 'deactivate' ? 'bg-red-100' : 'bg-green-100')">
+          <i class="text-lg" 
+             [ngClass]="(confirmAction === 'save-edit' || confirmAction === 'save-add') ? 'fa-solid fa-save text-blue-600' : (confirmAction === 'deactivate' ? 'fa-solid fa-trash-can text-red-600' : 'fa-solid fa-arrow-rotate-left text-green-600')"></i>
         </div>
-
-        <!-- Consejos de Siembra -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Consejos de Siembra</label>
-          <textarea 
-            formControlName="plantingTips"
-            rows="2"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            placeholder="Consejos para la siembra..."></textarea>
-        </div>
-
-        <!-- Consejos de Cosecha -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Consejos de Cosecha</label>
-          <textarea 
-            formControlName="harvestTips"
-            rows="2"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            placeholder="Consejos para la cosecha..."></textarea>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Confirmar Acción</h3>
+          <p class="text-sm text-gray-500">Esta acción requiere confirmación</p>
         </div>
       </div>
-
-      <!-- Footer -->
-      <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-        <button 
-          type="button" 
-          (click)="closeModals()" 
-          class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
-          Cancelar
-        </button>
-        <button 
-          type="submit" 
-          [disabled]="cropForm.invalid"
-          class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ showAddModal ? 'Agregar Cultivo' : 'Guardar Cambios' }}
-        </button>
-      </div>
-    </form>
+    </div>
+    
+    <!-- Contenido del Modal -->
+    <div class="px-6 py-5">
+      <p class="text-gray-700 leading-relaxed">{{ confirmMessage }}</p>
+    </div>
+    
+    <!-- Footer del Modal -->
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+      <button 
+        type="button" 
+        (click)="closeModals()" 
+        class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        (click)="executeConfirmAction()"
+        class="px-4 py-2 text-white rounded-lg transition-colors text-sm font-medium"
+        [ngClass]="confirmButtonColor">
+        {{ confirmButtonText }}
+      </button>
+    </div>
   </div>
 </div>
