@@ -17,14 +17,14 @@
     <div *ngFor="let nota of listaNotificaciones; let i = index" 
          (mouseenter)="iniciarAutoVisto(i)"
          (mouseleave)="cancelarAutoVisto(i)"
-         class="grid grid-cols-5 items-center bg-white p-4 rounded-xl shadow-sm border-l-[6px] hover:shadow-md transition-all duration-300 relative"
+         class="grid grid-cols-5 items-center bg-white p-4 rounded-xl shadow-sm border-l-[6px] hover:shadow-md transition-all duration-500 relative"
          [ngClass]="{
-           'border-red-500': nota.tipo === 'critica',
-           'border-yellow-400': nota.tipo === 'advertencia',
-           'border-blue-400': nota.tipo === 'info'
+           'border-red-500': !nota.leido && nota.tipo === 'critica',
+           'border-yellow-400': !nota.leido && nota.tipo === 'advertencia',
+           'border-blue-400': !nota.leido && nota.tipo === 'info',
+           'border-cyan-400': nota.leido 
          }">
-      
-      <div class="flex justify-center">
+         <div class="flex justify-center">
         <div class="w-4 h-4 rounded-full transition-all duration-700"
              [ngClass]="nota.leido ? 'bg-cyan-400' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]'">
         </div>
@@ -34,9 +34,10 @@
         <div class="flex items-center gap-2 mb-1">
           <span class="text-[10px] font-black uppercase tracking-widest"
                 [ngClass]="{
-                  'text-red-500': nota.tipo === 'critica',
-                  'text-yellow-600': nota.tipo === 'advertencia',
-                  'text-blue-500': nota.tipo === 'info'
+                  'text-red-500': !nota.leido && nota.tipo === 'critica',
+                  'text-yellow-600': !nota.leido && nota.tipo === 'advertencia',
+                  'text-blue-500': !nota.leido && nota.tipo === 'info',
+                  'text-cyan-600': nota.leido
                 }">
             {{ nota.tipoLabel }}
           </span>
