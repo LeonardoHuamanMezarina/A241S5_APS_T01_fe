@@ -1,0 +1,249 @@
+<div class="calendario-page flex flex-col gap-6 w-full">
+
+  <!-- Header -->
+  <div class="page-header flex justify-between items-center gap-4 flex-wrap">
+    <div class="header-info">
+      <h2 class="text-2xl font-extrabold text-[#1a3a3a]">Calendario Agrícola</h2>
+      <p class="text-sm text-gray-500">Planifica siembras y cosechas</p>
+    </div>
+
+    <div class="header-actions w-full sm:w-auto">
+      <button
+        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 w-full sm:w-auto justify-center transition"
+        (click)="openAddModal()">
+        <i class="fa-solid fa-plus"></i> Agregar Evento
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="stat-card bg-white p-4 rounded-2xl shadow-sm flex flex-col gap-2" *ngFor="let stat of stats">
+      <span class="text-sm text-gray-500">{{ stat.label }}</span>
+      <span class="text-2xl font-extrabold" [style.color]="stat.fontColor">
+        {{ stat.value }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="calendar-main-card bg-white rounded-2xl shadow-md p-6">
+    <div class="calendar-card-header flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-[#1a3a3a]">
+        {{ monthName }} {{ currentYear }}
+      </h3>
+
+      <div class="flex gap-2">
+        <button
+          class="w-9 h-9 flex items-center justify-center rounded-lg border bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+          (click)="prevMonth()">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button
+          class="w-9 h-9 flex items-center justify-center rounded-lg border bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+          (click)="nextMonth()">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scroll -->
+    <div class="overflow-x-auto pb-2">
+      <div class="calendar-grid min-w-[600px]">
+
+        <!-- Header -->
+        <div class="grid grid-cols-7 border-b pb-3 mb-2 text-xs uppercase text-center text-[#f1f5f9]">
+          <div class="text-[#1a3a3a]" *ngFor="let day of dayNames">{{ day }}</div>
+        </div>
+
+        <!-- Body -->
+        <div class="grid grid-cols-7 gap-[1px] bg-gray-100 border border-gray-100">
+
+          <div *ngFor="let day of calendarDays" class="day-cell bg-white p-2 min-h-[80px] cursor-pointer"
+            [class.opacity-40]="!day.isCurrentMonth" [class.bg-green-50]="day.isToday"
+            [class.ring-2]="isDaySelected(day)" [class.ring-green-500]="isDaySelected(day)"
+            (click)="seleccionarDia(day)">
+
+            <div class="mb-2">
+              <span class="font-semibold text-sm" [class.bg-green-500]="day.isToday" [class.text-white]="day.isToday"
+                [class.rounded-full]="day.isToday" [class.w-6]="day.isToday" [class.h-6]="day.isToday"
+                [class.flex]="day.isToday" [class.items-center]="day.isToday" [class.justify-center]="day.isToday">
+                {{ day.date }}
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <div *ngFor="let event of day.events"
+                class="text-[10px] font-semibold text-white px-2 py-1 rounded flex items-center gap-1 truncate"
+                [style.background-color]="event.color">
+                <i [class]="getEventIcon(event.tipo)"></i>
+                <span>{{ getShortTitle(event.titulo) }}</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="grid lg:grid-cols-2 gap-6">
+
+    <!-- Leyenda -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm">
+      <h3 class="text-lg font-bold mb-4 text-[#1a3a3a]">Leyenda</h3>
+
+      <div class="flex flex-col gap-4">
+
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-green-500 text-white flex items-center justify-center rounded-lg">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+          <div>
+            <strong class="text-sm">Siembra</strong>
+            <p class="text-xs text-gray-500">Inicio de cultivo</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-yellow-500 text-white flex items-center justify-center rounded-lg">
+            <i class="fa-solid fa-wheat-awn"></i>
+          </div>
+          <div>
+            <strong class="text-sm">Cosecha Registrada</strong>
+            <p class="text-xs text-gray-500">Recolección de cultivo</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Próximos -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm">
+      <h3 class="text-lg font-bold mb-4 text-[#1a3a3a]">Próximos Eventos</h3>
+
+      <div class="flex flex-col gap-3">
+
+        <div *ngFor="let event of getUpcomingEvents()"
+          class="flex items-center gap-4 p-3 rounded-xl bg-green-50 hover:bg-green-100 transition">
+
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white"
+            [style.background-color]="event.color">
+            <i [class]="getEventIcon(event.tipo)"></i>
+          </div>
+
+          <div class="flex-1">
+            <strong class="text-sm text-[#1a3a3a]">{{ event.titulo }}</strong>
+            <p class="text-xs text-gray-500">{{ getParcelaName(event) }}</p>
+
+            <span class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-200 text-gray-600"
+              [class.bg-green-500]="isToday(event.fechaInicio)" [class.text-white]="isToday(event.fechaInicio)">
+              {{ isToday(event.fechaInicio) ? ('Hoy - ' + formatDate(event.fechaInicio)) : formatDate(event.fechaInicio)
+              }}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Agregar Evento -->
+@if (showAddModal) {
+<div class="modal-overlay" (click)="closeAddModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <h3>Nuevo Evento</h3>
+        <p>Programa una actividad en tu calendario agrícola</p>
+      </div>
+      <button class="close-btn" (click)="closeAddModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form class="evento-form">
+        <!-- Título del Evento -->
+        <div class="form-group">
+          <label>Título del Evento</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-heading"></i>
+            <input type="text" [(ngModel)]="newEvento.titulo" name="titulo"
+              placeholder="Ej: Riego programado - Parcela Norte" required>
+          </div>
+        </div>
+
+        <!-- Tipo y Parcela -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de Evento</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-tag"></i>
+              <select [(ngModel)]="newEvento.tipo" name="tipo" (change)="onTipoChange()">
+                <option *ngFor="let tipo of tiposEvento" [value]="tipo.value">
+                  {{ tipo.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Parcela</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <select [(ngModel)]="newEvento.parcelaId" name="parcelaId">
+                <option *ngFor="let parcela of parcelas" [value]="parcela.id">
+                  {{ parcela.nombre }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Inicio</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-calendar"></i>
+              <input type="date" [(ngModel)]="newEvento.fechaInicio" name="fechaInicio" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Fecha de Fin (Opcional)</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-calendar-check"></i>
+              <input type="date" [(ngModel)]="newEvento.fechaFin" name="fechaFin">
+            </div>
+          </div>
+        </div>
+
+        <!-- Color del Evento -->
+        <div class="form-group">
+          <label>Color del Evento</label>
+          <div class="color-selector">
+            <button type="button" *ngFor="let tipo of tiposEvento" class="color-btn"
+              [class.selected]="newEvento.color === tipo.color" [style.background-color]="tipo.color"
+              (click)="newEvento.color = tipo.color; newEvento.tipo = tipo.value" title="{{ tipo.label }}">
+              <i [class]="tipo.icon" *ngIf="newEvento.color === tipo.color"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="closeAddModal()">Cancelar</button>
+      <button class="btn btn-save" [disabled]="!newEvento.titulo || !newEvento.parcelaId || !newEvento.fechaInicio"
+        (click)="guardarEvento()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Evento
+      </button>
+    </div>
+  </div>
+</div>
+}
