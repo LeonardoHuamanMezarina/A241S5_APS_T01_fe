@@ -1,0 +1,107 @@
+<div class="dashboard">
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <p class="stat-label">{{ stat.label }}</p>
+            <p class="stat-value">{{ stat.value }}</p>
+          </div>
+          <div class="stat-icon" [ngClass]="stat.iconBg">
+            <i [class]="stat.iconClass"></i>
+          </div>
+        </div>
+        <span class="stat-badge" [ngClass]="stat.badgeClass">{{ stat.badge }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <!-- Line Chart -->
+    <div class="card chart-card-large">
+      <p class="card-title">Crecimiento de Cultivos</p>
+      <p class="card-subtitle">Progreso mensual por tipo de cultivo</p>
+      <div class="chart-wrapper">
+        <canvas #lineChart></canvas>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Trigo</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#eab308"></span>Maíz</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#92400e"></span>Arroz</span>
+      </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="card chart-card-small">
+      <p class="card-title">Distribución de Cultivos</p>
+      <p class="card-subtitle">Por área cultivada</p>
+      <div class="pie-wrapper">
+        <canvas #pieChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="bottom-row">
+    <!-- Weather -->
+    <div class="card weather-card">
+      <div class="weather-header">
+        <i class="fa-solid fa-cloud text-green-400 text-lg"></i>
+        <span class="weather-title">Clima Actual</span>
+      </div>
+      <div class="weather-body">
+        <div class="weather-icon-circle">
+          <i class="fa-solid fa-cloud text-blue-400 text-3xl"></i>
+        </div>
+        <p class="weather-temp">24°C</p>
+        <p class="weather-desc">Parcialmente nublado</p>
+      </div>
+      <div class="weather-details">
+        <div class="weather-detail-item">
+          <i class="fa-solid fa-droplet text-blue-400"></i>
+          <span class="detail-label">Humedad</span>
+          <span class="detail-value">65%</span>
+        </div>
+        <div class="weather-detail-item">
+          <i class="fa-solid fa-wind text-gray-400"></i>
+          <span class="detail-label">Viento</span>
+          <span class="detail-value">12 km/h</span>
+        </div>
+        <div class="weather-detail-item">
+          <i class="fa-solid fa-sun text-orange-400"></i>
+          <span class="detail-label">UV</span>
+          <span class="detail-value">Medio</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities -->
+    <div class="card activities-card">
+      <div class="activities-header">
+        <div>
+          <p class="card-title">Actividades Recientes</p>
+          <p class="card-subtitle">Últimas acciones en tus parcelas</p>
+        </div>
+        <button class="ver-seguimiento">Ver Seguimiento <i class="fa-solid fa-arrow-right text-xs"></i></button>
+      </div>
+      <div class="activities-list">
+        @for (act of activities; track act.title) {
+          <div class="activity-item">
+            <div class="activity-left">
+              <span class="activity-dot" [ngClass]="act.dotClass"></span>
+              <div>
+                <p class="activity-title">{{ act.title }}</p>
+                <p class="activity-subtitle">{{ act.subtitle }}</p>
+              </div>
+            </div>
+            <span class="activity-time">{{ act.time }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>
