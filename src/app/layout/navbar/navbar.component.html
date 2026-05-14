@@ -1,14 +1,48 @@
-<header class="h-full flex items-center justify-between px-6 bg-white border-b border-gray-200">
+<header class="h-full flex items-center justify-between px-6 bg-white border-b border-gray-200 relative">
   <div class="flex items-center">
-    <!-- Navbar Title u Opciones futuras pueden ir aquí -->
     <h2 class="text-xl font-bold text-gray-800">Administra tus parcelas y cultivos</h2>
   </div>
 
   <div class="flex items-center gap-4">
-    <button class="relative p-2 text-gray-400 hover:text-gray-500 transition-colors">
-      <i class="fa-regular fa-bell text-xl"></i>
-      <span class="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] font-bold text-white">3</span>
-    </button>
+    <div class="relative">
+      <button (click)="toggleMenu()" class="relative p-2 text-gray-400 hover:text-green-600 transition-colors">
+        <i class="fa-regular fa-bell text-xl"></i>
+        <span *ngIf="notificationService.totalNuevas > 0" 
+              class="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 border-2 border-white rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+          {{ notificationService.totalNuevas }}
+        </span>
+      </button>
+
+      <div *ngIf="menuAbierto" 
+           class="absolute top-12 right-0 w-80 bg-white shadow-2xl rounded-2xl border border-gray-100 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+        
+        <div class="p-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+          <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Notificaciones nuevas</span>
+        </div>
+
+        <div class="max-h-64 overflow-y-auto">
+          <ng-container *ngFor="let nota of notificationService.lista">
+            <div *ngIf="!nota.leido" class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <div class="flex justify-between items-start mb-1">
+                <span class="text-[9px] font-black text-green-600 uppercase">{{ nota.tipoLabel }}</span>
+                <span class="text-[9px] text-gray-400">{{ nota.fecha }}</span>
+              </div>
+              <p class="text-[11px] text-gray-700 font-medium leading-tight">{{ nota.detalle }}</p>
+            </div>
+          </ng-container>
+
+          <div *ngIf="notificationService.totalNuevas === 0" class="p-8 text-center">
+            <p class="text-xs text-gray-400 italic">No hay avisos recientes</p>
+          </div>
+        </div>
+
+        <div class="p-2 text-center border-t border-gray-50 bg-gray-50/20">
+          <button (click)="menuAbierto = false" class="text-[10px] font-bold text-gray-400 hover:text-green-600 uppercase">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
     
     <button class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-medium shadow-sm">
       <i class="fa-regular fa-user"></i>
